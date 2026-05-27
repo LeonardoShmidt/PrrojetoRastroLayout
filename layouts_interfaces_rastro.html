@@ -1,0 +1,537 @@
+
+<style>
+:root { --phone-w: 120px; --phone-h: 214px; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.wrap { padding: 12px 8px 8px; }
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin: 18px 0 8px; padding-left: 4px; border-left: 3px solid #378ADD; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.phone-label { font-size: 11px; color: var(--color-text-secondary); text-align: center; max-width: 120px; }
+.phone { width: 120px; height: 214px; border-radius: 14px; border: 2px solid var(--color-border-secondary); background: var(--color-background-primary); overflow: hidden; position: relative; display: flex; flex-direction: column; cursor: pointer; transition: transform .15s; }
+.phone:hover { transform: scale(1.04); }
+.phone .status-bar { height: 14px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 8px; color: #fff; flex-shrink: 0; }
+.phone .screen { flex: 1; overflow: hidden; position: relative; }
+.phone .nav-bar { height: 26px; background: rgba(0,0,0,.06); display: flex; align-items: center; justify-content: space-around; flex-shrink: 0; }
+.nav-icon { font-size: 14px; color: var(--color-text-secondary); }
+.nav-icon.active { color: #378ADD; }
+/* arrow connectors */
+.flow-row { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.arrow-lbl { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.arr-line { width: 28px; height: 2px; background: var(--color-border-secondary); position: relative; }
+.arr-line::after { content:''; position:absolute; right:-1px; top:-4px; border-left:6px solid var(--color-border-secondary); border-top:5px solid transparent; border-bottom:5px solid transparent; }
+.arr-lbl-txt { font-size: 9px; color: var(--color-text-secondary); white-space: nowrap; }
+/* ---- screen content helpers ---- */
+.s-btn { display: block; margin: 4px auto; background: #378ADD; color: #fff; border: none; border-radius: 6px; font-size: 9px; padding: 4px 10px; text-align: center; cursor: default; }
+.s-btn-out { display: block; margin: 4px auto; background: transparent; color: #378ADD; border: 1px solid #378ADD; border-radius: 6px; font-size: 9px; padding: 3px 10px; text-align: center; cursor: default; }
+.s-input { display: block; margin: 3px 8px; background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: 5px; font-size: 8px; color: var(--color-text-secondary); padding: 3px 5px; }
+.s-title { font-size: 10px; font-weight: 500; color: var(--color-text-primary); text-align: center; margin: 5px 0 3px; }
+.s-sub { font-size: 8px; color: var(--color-text-secondary); text-align: center; margin: 0 6px 3px; }
+.s-divider { height: 1px; background: var(--color-border-tertiary); margin: 4px 8px; }
+.badge { display: inline-block; font-size: 8px; padding: 2px 6px; border-radius: 10px; }
+.badge-ok { background: #e8f7ef; color: #1D9E75; }
+.badge-warn { background: #fff3e0; color: #BA7517; }
+.badge-err { background: #fdecea; color: #D85A30; }
+.s-timer { font-size: 18px; font-weight: 500; color: #378ADD; text-align: center; margin: 6px 0 2px; }
+.s-row { display: flex; justify-content: space-between; padding: 2px 8px; font-size: 8px; color: var(--color-text-secondary); }
+.s-map-bg { background: #e8f0e4; height: 70px; margin: 0 0; position: relative; display: flex; align-items: center; justify-content: center; }
+.s-pin { font-size: 18px; }
+.s-chip { display: inline-block; font-size: 8px; background: #378ADD; color: #fff; border-radius: 8px; padding: 2px 6px; margin: 2px 4px; }
+.s-hist-item { display: flex; justify-content: space-between; padding: 3px 8px; border-bottom: 1px solid var(--color-border-tertiary); font-size: 8px; }
+.s-saldo { font-size: 16px; font-weight: 500; color: #1D9E75; text-align: center; margin: 4px 0; }
+.progress { height: 4px; background: var(--color-border-tertiary); border-radius: 2px; margin: 0 8px 4px; }
+.progress-fill { height: 4px; background: #378ADD; border-radius: 2px; }
+.qr-box { width: 50px; height: 50px; border: 2px solid #378ADD; border-radius: 6px; margin: 6px auto; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.corner { position: absolute; width: 8px; height: 8px; }
+.c-tl { top:4px; left:4px; border-top:2px solid #378ADD; border-left:2px solid #378ADD; }
+.c-tr { top:4px; right:4px; border-top:2px solid #378ADD; border-right:2px solid #378ADD; }
+.c-bl { bottom:4px; left:4px; border-bottom:2px solid #378ADD; border-left:2px solid #378ADD; }
+.c-br { bottom:4px; right:4px; border-bottom:2px solid #378ADD; border-right:2px solid #378ADD; }
+.avatar-circle { width: 36px; height: 36px; border-radius: 50%; background: #1A4A8A; color: #fff; font-size: 14px; font-weight: 500; display: flex; align-items: center; justify-content: center; margin: 4px auto; }
+.pay-option { display: flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid var(--color-border-tertiary); border-radius: 5px; margin: 3px 8px; font-size: 8px; color: var(--color-text-primary); cursor: default; }
+.pay-option.selected { border-color: #378ADD; background: #e6f1fb; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; }
+.dot.active { background: #378ADD; }
+.step-dots { display: flex; gap: 4px; justify-content: center; margin: 3px 0; }
+</style>
+
+<div class="wrap">
+
+<!-- FLUXO VISUAL -->
+<div style="background:var(--color-background-secondary);border-radius:8px;padding:8px 10px;margin-bottom:12px;font-size:11px;color:var(--color-text-secondary)">
+  <span style="font-weight:500;color:var(--color-text-primary)">Fluxo de navegação:</span>
+  Splash → Login → [Cadastro | Mapa] → QR Code → Corrida → Encerrar → Pagamento → Confirmação → Mapa
+</div>
+
+<!-- GRUPO 1: Autenticação -->
+<div class="section-title">1 · Autenticação e Acesso</div>
+<div class="flow-row">
+
+  <!-- T1: Splash -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T1')">
+      <div class="status-bar" style="background:#1A4A8A">
+        <span>9:41</span><span>●●●</span>
+      </div>
+      <div class="screen" style="background:#1A4A8A;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:26px;font-weight:500;color:#fff;letter-spacing:2px">RaSTrO</div>
+        <div style="font-size:9px;color:#9fc8f5;margin-top:3px">Rapidópolis Scooter Transport</div>
+        <div style="font-size:28px;margin-top:10px">🛴</div>
+        <div style="margin-top:14px;display:flex;gap:4px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:.4"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:#fff"></span>
+          <span style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:.4"></span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">T1 – Splash Screen</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">auto</div></div>
+
+  <!-- T2: Login -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T2')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:40px;background:#1A4A8A;display:flex;align-items:center;justify-content:center">
+          <span style="font-size:11px;font-weight:500;color:#fff">RaSTrO</span>
+        </div>
+        <div class="s-title">Entrar na conta</div>
+        <div class="s-sub">CPF ou Passaporte</div>
+        <div class="s-input">CPF / Passaporte</div>
+        <div class="s-input">Senha</div>
+        <div style="text-align:center;margin:2px 0">
+          <span style="font-size:8px;color:#378ADD">Reconhecimento facial · Digital</span>
+        </div>
+        <div class="s-btn">Entrar</div>
+        <div class="s-divider"></div>
+        <div class="s-btn-out">Criar conta</div>
+        <div style="text-align:center;margin-top:3px">
+          <span style="font-size:8px;color:#378ADD">Esqueci minha senha</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">T2 – Login</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">Cadastro</div></div>
+
+  <!-- T3: Cadastro Etapa 1 -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T3')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:28px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px;gap:6px">
+          <span style="color:#fff;font-size:12px">←</span>
+          <span style="font-size:10px;color:#fff">Cadastro</span>
+        </div>
+        <div class="step-dots" style="margin-top:5px">
+          <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="s-sub">Etapa 1 de 3 – Dados Pessoais</div>
+        <div class="s-input">Nome completo</div>
+        <div class="s-input">CPF ou Passaporte</div>
+        <div class="s-input">Data de nascimento</div>
+        <div class="s-input">País de origem</div>
+        <div class="s-input">Endereço</div>
+        <div class="progress"><div class="progress-fill" style="width:33%"></div></div>
+        <div class="s-btn">Próximo →</div>
+      </div>
+    </div>
+    <div class="phone-label">T3 – Cadastro (1/3)</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">próximo</div></div>
+
+  <!-- T4: Cadastro Etapa 2 -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T4')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:28px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px;gap:6px">
+          <span style="color:#fff;font-size:12px">←</span>
+          <span style="font-size:10px;color:#fff">Cadastro</span>
+        </div>
+        <div class="step-dots" style="margin-top:5px">
+          <span class="dot"></span><span class="dot active"></span><span class="dot"></span>
+        </div>
+        <div class="s-sub">Etapa 2 de 3 – Contato e Acesso</div>
+        <div class="s-input">E-mail</div>
+        <div class="s-input">Telefone</div>
+        <div class="s-input">Senha</div>
+        <div class="s-input">Confirmar senha</div>
+        <div style="text-align:center;margin:3px 0 0">
+          <div style="font-size:8px;color:var(--color-text-secondary);margin:0 8px">Foto de perfil (obrigatório)</div>
+          <div style="width:30px;height:30px;border-radius:50%;border:1px dashed #378ADD;margin:3px auto;display:flex;align-items:center;justify-content:center;font-size:14px">📷</div>
+        </div>
+        <div class="progress"><div class="progress-fill" style="width:66%"></div></div>
+        <div class="s-btn">Próximo →</div>
+      </div>
+    </div>
+    <div class="phone-label">T4 – Cadastro (2/3)</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">próximo</div></div>
+
+  <!-- T5: Cadastro Etapa 3 -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T5')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:28px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px;gap:6px">
+          <span style="color:#fff;font-size:12px">←</span>
+          <span style="font-size:10px;color:#fff">Cadastro</span>
+        </div>
+        <div class="step-dots" style="margin-top:5px">
+          <span class="dot"></span><span class="dot"></span><span class="dot active"></span>
+        </div>
+        <div class="s-sub">Etapa 3 de 3 – Pagamento</div>
+        <div class="pay-option selected" style="margin-top:6px">💳 <span>Cartão de crédito</span></div>
+        <div class="s-input" style="margin-top:2px">Número do cartão</div>
+        <div style="display:flex;gap:4px;margin:0 8px">
+          <div class="s-input" style="margin:2px 0;flex:1">Val.</div>
+          <div class="s-input" style="margin:2px 0;flex:1">CVV</div>
+        </div>
+        <div class="pay-option">💰 <span>Conta de créditos RaSTrO</span></div>
+        <div class="progress" style="margin-top:4px"><div class="progress-fill" style="width:100%"></div></div>
+        <div class="s-btn">Finalizar cadastro</div>
+      </div>
+    </div>
+    <div class="phone-label">T5 – Cadastro (3/3)</div>
+  </div>
+
+</div>
+
+<!-- GRUPO 2: Locação -->
+<div class="section-title">2 · Locação do Patinete</div>
+<div class="flow-row">
+
+  <!-- T6: Mapa Principal -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T6')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:24px;background:#1A4A8A;display:flex;align-items:center;justify-content:space-between;padding:0 8px">
+          <span style="font-size:10px;color:#fff;font-weight:500">RaSTrO</span>
+          <div class="avatar-circle" style="width:20px;height:20px;font-size:9px">U</div>
+        </div>
+        <div class="s-map-bg">
+          <div style="position:absolute;top:12px;left:30px;font-size:14px">📍</div>
+          <div style="position:absolute;top:8px;left:55px;font-size:14px">🛴</div>
+          <div style="position:absolute;top:20px;left:80px;font-size:14px">🛴</div>
+          <div style="position:absolute;top:5px;right:25px;font-size:14px">🛴</div>
+          <div style="position:absolute;bottom:4px;right:8px;background:#fff;border-radius:4px;font-size:8px;padding:2px 5px;border:1px solid var(--color-border-tertiary)">🛴 8 próximos</div>
+        </div>
+        <div style="padding:4px 8px">
+          <div style="font-size:9px;font-weight:500;color:var(--color-text-primary)">Patinetes disponíveis</div>
+          <div style="font-size:8px;color:var(--color-text-secondary)">Toque em um ícone ou escaneie</div>
+        </div>
+        <div class="s-btn">📷 Escanear QR Code</div>
+      </div>
+      <div class="nav-bar">
+        <span class="nav-icon active">🗺</span>
+        <span class="nav-icon">🕐</span>
+        <span class="nav-icon">💰</span>
+        <span class="nav-icon">👤</span>
+      </div>
+    </div>
+    <div class="phone-label">T6 – Mapa Principal</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">escanear</div></div>
+
+  <!-- T7: Leitura QR Code -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T7')">
+      <div class="status-bar" style="background:#000"><span style="color:#fff">9:41</span><span style="color:#fff">●●●</span></div>
+      <div class="screen" style="background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:9px;color:#fff;margin-bottom:8px">Aponte para o QR Code</div>
+        <div class="qr-box" style="background:#222;border-color:#fff;position:relative">
+          <div class="corner c-tl" style="border-color:#fff"></div>
+          <div class="corner c-tr" style="border-color:#fff"></div>
+          <div class="corner c-bl" style="border-color:#fff"></div>
+          <div class="corner c-br" style="border-color:#fff"></div>
+          <div style="font-size:20px">▩</div>
+        </div>
+        <div style="font-size:8px;color:#aaa;margin-top:8px">Câmera ativa · GPS: OK</div>
+        <div style="font-size:8px;color:#4caf50;margin-top:4px">✓ Usuário verificado</div>
+        <div style="margin-top:10px">
+          <span style="font-size:8px;color:#888">Patinete: –</span>
+        </div>
+      </div>
+      <div style="height:26px;background:#000;display:flex;align-items:center;justify-content:center">
+        <span style="font-size:8px;color:#888">← Cancelar</span>
+      </div>
+    </div>
+    <div class="phone-label">T7 – Leitura QR Code</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">QR lido</div></div>
+
+  <!-- T8: Confirmação pré-corrida -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T8')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px">
+          <span style="font-size:10px;color:#fff">Confirmar locação</span>
+        </div>
+        <div style="text-align:center;margin:6px 0 2px;font-size:22px">🛴</div>
+        <div class="s-title">Patinete #A-042</div>
+        <div style="margin:2px 8px">
+          <div class="s-row"><span>Bateria</span><span class="badge badge-ok">87%</span></div>
+          <div class="s-row"><span>Modelo</span><span>RaSTrO X2</span></div>
+          <div class="s-row"><span>Taxa inicial</span><span>R$ 3,00</span></div>
+          <div class="s-row"><span>Tarifa/min</span><span>R$ 0,50</span></div>
+        </div>
+        <div class="s-divider"></div>
+        <div class="s-sub">GPS ativo · Usuário: sem pendências</div>
+        <div class="s-btn">🚀 Liberar e iniciar</div>
+        <div class="s-btn-out">Cancelar</div>
+      </div>
+    </div>
+    <div class="phone-label">T8 – Confirmar Locação</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">iniciar</div></div>
+
+  <!-- T9: Corrida em andamento -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T9')">
+      <div class="status-bar" style="background:#0F6E56"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#0F6E56;display:flex;align-items:center;justify-content:center">
+          <span style="font-size:10px;color:#fff;font-weight:500">Corrida em andamento</span>
+        </div>
+        <div class="s-timer">00:14:32</div>
+        <div style="text-align:center;font-size:8px;color:var(--color-text-secondary);margin-bottom:4px">tempo de uso</div>
+        <div class="s-divider"></div>
+        <div class="s-row"><span>Valor atual</span><span style="color:#1D9E75;font-weight:500">R$ 10,26</span></div>
+        <div class="s-row"><span>Patinete</span><span>#A-042</span></div>
+        <div class="s-row"><span>Bateria</span><span class="badge badge-ok">81%</span></div>
+        <div class="s-divider"></div>
+        <div style="display:flex;gap:6px;padding:0 8px">
+          <div class="s-btn-out" style="flex:1;text-align:center">⏸ Pausar</div>
+          <div class="s-btn" style="flex:1;text-align:center;background:#D85A30">🏁 Encerrar</div>
+        </div>
+        <div style="text-align:center;margin-top:4px">
+          <span style="font-size:8px;color:var(--color-text-secondary)">Pausa: até 15 min</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">T9 – Corrida Ativa</div>
+  </div>
+
+</div>
+
+<!-- GRUPO 3: Encerramento e Pagamento -->
+<div class="section-title">3 · Encerramento e Pagamento</div>
+<div class="flow-row">
+
+  <!-- T10: Resumo corrida -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T10')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px">
+          <span style="font-size:10px;color:#fff">Resumo da corrida</span>
+        </div>
+        <div style="text-align:center;font-size:22px;margin:6px 0 2px">🏁</div>
+        <div class="s-title">Corrida encerrada</div>
+        <div style="margin:2px 8px">
+          <div class="s-row"><span>Duração</span><span style="font-weight:500">20 min</span></div>
+          <div class="s-row"><span>Taxa inicial</span><span>R$ 3,00</span></div>
+          <div class="s-row"><span>Tempo (20 × 0,50)</span><span>R$ 10,00</span></div>
+          <div class="s-divider"></div>
+          <div class="s-row"><span style="font-weight:500">Total</span><span style="font-weight:500;color:#378ADD;font-size:12px">R$ 13,00</span></div>
+        </div>
+        <div class="s-btn">Ir para pagamento →</div>
+      </div>
+    </div>
+    <div class="phone-label">T10 – Resumo Corrida</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">pagar</div></div>
+
+  <!-- T11: Pagamento -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T11')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px">
+          <span style="font-size:10px;color:#fff">Pagamento</span>
+        </div>
+        <div style="text-align:center;font-size:13px;font-weight:500;color:var(--color-text-primary);margin:6px 0 2px">R$ 13,00</div>
+        <div class="s-sub">Escolha a forma de pagamento</div>
+        <div class="pay-option selected">💳 Cartão •••• 4532</div>
+        <div class="pay-option">💰 Créditos: R$ 25,00</div>
+        <div class="pay-option">📱 PIX</div>
+        <div class="s-divider"></div>
+        <div class="s-btn" style="margin-top:6px">Confirmar pagamento</div>
+        <div style="text-align:center;margin-top:3px">
+          <span style="font-size:8px;color:var(--color-text-secondary)">🔒 Transação criptografada</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">T11 – Pagamento</div>
+  </div>
+
+  <div class="arrow-lbl"><div class="arr-line"></div><div class="arr-lbl-txt">confirmar</div></div>
+
+  <!-- T12: Confirmação -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T12')">
+      <div class="status-bar" style="background:#0F6E56"><span>9:41</span><span>●●●</span></div>
+      <div class="screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:36px">✅</div>
+        <div class="s-title" style="margin-top:6px">Pagamento confirmado!</div>
+        <div class="s-sub">Patinete bloqueado com sucesso</div>
+        <div class="s-divider" style="width:80%;margin:6px auto"></div>
+        <div style="font-size:8px;color:var(--color-text-secondary);text-align:center;padding:0 10px">Obrigado por usar o RaSTrO.<br/>Recibo enviado por e-mail.</div>
+        <div class="s-btn" style="margin-top:8px;width:80%">Voltar ao mapa</div>
+      </div>
+    </div>
+    <div class="phone-label">T12 – Confirmação</div>
+  </div>
+
+</div>
+
+<!-- GRUPO 4: Histórico e Carteira -->
+<div class="section-title">4 · Histórico e Carteira Digital</div>
+<div class="flow-row">
+
+  <!-- T13: Histórico -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T13')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px">
+          <span style="font-size:10px;color:#fff">Histórico de corridas</span>
+        </div>
+        <div style="padding:4px 8px 2px;font-size:8px;color:var(--color-text-secondary)">3 corridas este mês</div>
+        <div class="s-hist-item">
+          <div><div style="font-size:9px;font-weight:500">27/05/2026</div><div style="font-size:8px;color:var(--color-text-secondary)">20 min · #A-042</div></div>
+          <div style="text-align:right"><span style="font-size:10px;font-weight:500;color:#378ADD">R$13,00</span><br/><span class="badge badge-ok" style="font-size:7px">Pago</span></div>
+        </div>
+        <div class="s-hist-item">
+          <div><div style="font-size:9px;font-weight:500">25/05/2026</div><div style="font-size:8px;color:var(--color-text-secondary)">35 min · #B-017</div></div>
+          <div style="text-align:right"><span style="font-size:10px;font-weight:500;color:#378ADD">R$20,50</span><br/><span class="badge badge-ok" style="font-size:7px">Pago</span></div>
+        </div>
+        <div class="s-hist-item">
+          <div><div style="font-size:9px;font-weight:500">20/05/2026</div><div style="font-size:8px;color:var(--color-text-secondary)">12 min · #C-003</div></div>
+          <div style="text-align:right"><span style="font-size:10px;font-weight:500;color:#D85A30">R$9,00</span><br/><span class="badge badge-err" style="font-size:7px">Pendente</span></div>
+        </div>
+        <div style="text-align:center;padding:4px">
+          <span style="font-size:8px;color:#378ADD">Ver todas →</span>
+        </div>
+      </div>
+      <div class="nav-bar">
+        <span class="nav-icon">🗺</span>
+        <span class="nav-icon active">🕐</span>
+        <span class="nav-icon">💰</span>
+        <span class="nav-icon">👤</span>
+      </div>
+    </div>
+    <div class="phone-label">T13 – Histórico</div>
+  </div>
+
+  <!-- T14: Carteira -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T14')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px">
+          <span style="font-size:10px;color:#fff">Carteira RaSTrO</span>
+        </div>
+        <div style="background:#0F6E56;padding:6px 8px;text-align:center">
+          <div style="font-size:8px;color:#9fe1cb">Saldo disponível</div>
+          <div class="s-saldo" style="color:#fff">R$ 25,00</div>
+        </div>
+        <div style="padding:4px 8px">
+          <div style="font-size:8px;color:var(--color-text-secondary);margin:3px 0">Débito pendente</div>
+          <div style="background:#fdecea;border-radius:5px;padding:4px 8px;font-size:8px;color:#D85A30;margin-bottom:6px">⚠ R$ 9,00 em aberto</div>
+          <div style="font-size:8px;color:var(--color-text-secondary);margin-bottom:3px">Recarregar créditos</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <span class="s-chip">R$10</span><span class="s-chip">R$20</span><span class="s-chip">R$50</span><span class="s-chip">Outro</span>
+          </div>
+          <div class="s-input" style="margin-top:5px">Valor personalizado</div>
+          <div class="s-btn" style="margin-top:4px">Recarregar agora</div>
+        </div>
+      </div>
+      <div class="nav-bar">
+        <span class="nav-icon">🗺</span>
+        <span class="nav-icon">🕐</span>
+        <span class="nav-icon active">💰</span>
+        <span class="nav-icon">👤</span>
+      </div>
+    </div>
+    <div class="phone-label">T14 – Carteira</div>
+  </div>
+
+  <!-- T15: Recuperar Senha -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T15')">
+      <div class="status-bar" style="background:#1A4A8A"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#1A4A8A;display:flex;align-items:center;padding:0 8px;gap:6px">
+          <span style="color:#fff;font-size:12px">←</span>
+          <span style="font-size:10px;color:#fff">Recuperar senha</span>
+        </div>
+        <div style="text-align:center;font-size:28px;margin:10px 0 4px">🔑</div>
+        <div class="s-title">Redefinir senha</div>
+        <div class="s-sub">Insira o e-mail cadastrado para receber o link de redefinição.</div>
+        <div class="s-input" style="margin-top:8px">E-mail cadastrado</div>
+        <div class="s-btn" style="margin-top:6px">Enviar link</div>
+        <div style="text-align:center;margin-top:6px">
+          <span style="font-size:8px;color:#378ADD">← Voltar ao login</span>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">T15 – Recuperar Senha</div>
+  </div>
+
+  <!-- T16: Pausa Corrida -->
+  <div class="phone-wrap">
+    <div class="phone" onclick="highlight(this,'T16')">
+      <div class="status-bar" style="background:#854F0B"><span>9:41</span><span>●●●</span></div>
+      <div class="screen">
+        <div style="height:26px;background:#854F0B;display:flex;align-items:center;justify-content:center">
+          <span style="font-size:10px;color:#fff;font-weight:500">⏸ Corrida pausada</span>
+        </div>
+        <div style="text-align:center;font-size:9px;color:#BA7517;background:#fff3e0;padding:4px;margin:4px 8px;border-radius:5px">
+          Patinete bloqueado · Retorne em até
+        </div>
+        <div class="s-timer" style="color:#BA7517">14:58</div>
+        <div style="text-align:center;font-size:8px;color:var(--color-text-secondary)">tempo restante de pausa</div>
+        <div class="s-divider"></div>
+        <div class="s-row"><span>Corrida acumulada</span><span>00:14:32</span></div>
+        <div class="s-row"><span>Valor até agora</span><span style="color:#BA7517">R$ 10,26</span></div>
+        <div class="s-divider"></div>
+        <div class="s-btn" style="background:#1D9E75">▶ Retomar corrida</div>
+        <div class="s-btn-out" style="border-color:#D85A30;color:#D85A30">🏁 Encerrar mesmo assim</div>
+      </div>
+    </div>
+    <div class="phone-label">T16 – Pausa Ativa</div>
+  </div>
+
+</div>
+
+<!-- Mapa de fluxo -->
+<div class="section-title">5 · Mapa de Vínculos entre Interfaces</div>
+<div style="background:var(--color-background-secondary);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);line-height:1.9">
+  <span style="color:var(--color-text-primary);font-weight:500">Fluxo Principal:</span> T1 → T2 → T6 → T7 → T8 → T9 → T10 → T11 → T12 → T6<br/>
+  <span style="color:var(--color-text-primary);font-weight:500">Cadastro novo:</span> T2 → T3 → T4 → T5 → T2<br/>
+  <span style="color:var(--color-text-primary);font-weight:500">Pausa opcional:</span> T9 ⇄ T16 (extend UC07)<br/>
+  <span style="color:var(--color-text-primary);font-weight:500">Menu inferior:</span> T6 ↔ T13 (Histórico) · T6 ↔ T14 (Carteira)<br/>
+  <span style="color:var(--color-text-primary);font-weight:500">Recuperação de senha:</span> T2 → T15 → e-mail → T2<br/>
+  <span style="color:var(--color-text-primary);font-weight:500">Erro GPS/sem cadastro:</span> qualquer tela → alerta → retorno ao ponto anterior
+</div>
+
+</div>
+<script>
+function highlight(el, id) {
+  document.querySelectorAll('.phone').forEach(p => p.style.boxShadow = '');
+  el.style.boxShadow = '0 0 0 2px #378ADD';
+}
+</script>
